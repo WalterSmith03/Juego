@@ -7,7 +7,9 @@ alto = 600
 
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
-pygame
+
+pygame.display.set_caption("Mi Primer Juego")
+
 run = True
 while run == True:
     for event in pygame.event.get():
