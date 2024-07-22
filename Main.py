@@ -21,25 +21,32 @@ mover_abajo = False
 mover_izquierda = False
 mover_derecha = False
 
+#CONTROLAR EL FRENTE RATE
+reloj = pygame.time.Clock()
+
 run = True
 while run == True:
+
+    #QUE VAYA A 60 FPS
+    reloj.tick(Constantes.FPS)
+
+    ventana.fill(Constantes.COLOR_BG)
 
     #CALCULAR EL MOVIMIENTO DEL JUGADOR
     delta_x = 0
     delta_y = 0
 
     if mover_derecha == True:
-        delta_x = 5
+        delta_x = Constantes.VELOCIDAD
     if mover_izquierda == True:
-        delta_x = -5
+        delta_x = -Constantes.VELOCIDAD
     if mover_arriba == True:
-        delta_x = -5
-    if mover_derecha == True:
-        delta_x = 5
+        delta_y = -Constantes.VELOCIDAD
+    if mover_abajo == True:
+        delta_y = Constantes.VELOCIDAD
 
-
-
-
+    #MVOVER ALL JUGADOR
+    Jugador.movimeinto(delta_x, delta_y)
 
     Jugador.dibujar(ventana)
 
@@ -57,6 +64,17 @@ while run == True:
             if event.key == pygame.K_s:
                 mover_abajo = True
 
+
+        #PARA CUANDO SE SUELTA LA TECLA
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_a:
+                mover_izquierda = False
+            if event.key == pygame.K_d:
+                mover_derecha = False
+            if event.key == pygame.K_w:
+                mover_arriba = False
+            if event.key == pygame.K_s:
+                mover_abajo = False
 
     pygame.display.update()
 
