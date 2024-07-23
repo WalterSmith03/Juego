@@ -2,7 +2,8 @@ import pygame
 import Constantes
 
 class Personaje():
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
+        self.image = image
         self.forma = pygame.Rect(0, 0, Constantes.ANCHO_PERSONAJE,
                                         Constantes.ALTO_PERSONAJE)
         self.forma.center = (x,y)
@@ -12,6 +13,7 @@ class Personaje():
         self.forma.y = self.forma.y + delta_y
 
     def dibujar(self, interfaz):
+        interfaz.blit(self.image, self.forma)
         pygame.draw.rect(interfaz, Constantes.COLOR_PERSONAJE,  self.forma)
 
 

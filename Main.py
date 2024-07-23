@@ -7,7 +7,9 @@ ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
 pygame.display.set_caption("Mi Primer Juego")
 
-Jugador = Personaje(50, 50)
+player_image = pygame.image.load("assets//images//characters//player//Player_0.png")
+
+Jugador = Personaje(50, 50, player_image)
 
 ancho = 800
 alto = 600
