@@ -7,12 +7,23 @@ ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
 pygame.display.set_caption("Mi Primer Juego")
 
-player_image = pygame.image.load("assets//images//characters//player//Player_0.png")
+def escalar_img(image, scale):
+    w = image.get_width()
+    h = image.get_height()
+    nueva_imagen = pygame.transform.scale(image, (w*scale, h*scale))
+    return nueva_imagen
 
-Jugador = Personaje(50, 50, player_image)
+animaciones = []
+for i in range (7):
+    img = pygame.image.load(f"assets//images//characters//player//Player_{i}.png")
+    img = escalar_img(img, Constantes.SCALA_PERSONAJE)
+    animaciones.append(img)
 
-ancho = 800
-alto = 600
+
+
+
+Jugador = Personaje(50, 50, animaciones)
+
 
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
@@ -26,6 +37,8 @@ reloj = pygame.time.Clock()
 
 run = True
 while run == True:
+
+
 
     #QUE VAYA A 60 FPS
     reloj.tick(Constantes.FPS)
@@ -47,6 +60,8 @@ while run == True:
 
     #MVOVER ALL JUGADOR
     Jugador.movimeinto(delta_x, delta_y)
+
+    Jugador.update()
 
     Jugador.dibujar(ventana)
 
