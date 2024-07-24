@@ -1,6 +1,7 @@
 import pygame
 import Constantes
 from Personaje import Personaje
+from weapon import Weapon
 
 pygame.init()
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
@@ -13,17 +14,24 @@ def escalar_img(image, scale):
     nueva_imagen = pygame.transform.scale(image, (w*scale, h*scale))
     return nueva_imagen
 
+#IMPORTAR IMAGENES
+#PERSONAJE
 animaciones = []
 for i in range (7):
-    img = pygame.image.load(f"assets//images//characters//player//Player_{i}.png")
+    img = pygame.image.load(f"assets//images//characters//player//Player_{i}.png").convert_alpha()
     img = escalar_img(img, Constantes.SCALA_PERSONAJE)
     animaciones.append(img)
 
+#ARMA
+imagen_pistola = pygame.image.load(f"assets//images//characters//weapons//gun.png").convert_alpha()
 
 
 
+#CREAR UN JUGADOR DE LA CLASE PERSONAJE
 Jugador = Personaje(50, 50, animaciones)
 
+#CREAR UN ARMA DE LA CLASE WEAPON
+pistola = Weapon(imagen_pistola)
 
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
@@ -37,12 +45,8 @@ reloj = pygame.time.Clock()
 
 run = True
 while run == True:
-
-
-
     #QUE VAYA A 60 FPS
     reloj.tick(Constantes.FPS)
-
     ventana.fill(Constantes.COLOR_BG)
 
     #CALCULAR EL MOVIMIENTO DEL JUGADOR
@@ -61,9 +65,17 @@ while run == True:
     #MVOVER ALL JUGADOR
     Jugador.movimeinto(delta_x, delta_y)
 
+    #ACTUALIZA EL ESTADO DEL JUGADOR
     Jugador.update()
 
+    #ACTUALIZA EL ESTADO DEL ARMA
+    pistola.update(Jugador)
+
+    #DIBUJAR AL JUGADOR
     Jugador.dibujar(ventana)
+
+    #DIBUJAR EL ARMA
+    pistola.dibujar(ventana)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
