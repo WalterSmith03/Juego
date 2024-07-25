@@ -1,7 +1,7 @@
 import pygame
 import Constantes
 from Personaje import Personaje
-from weapon import Weapon
+from Weapon import Weapon
 
 pygame.init()
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
@@ -18,13 +18,13 @@ def escalar_img(image, scale):
 #PERSONAJE
 animaciones = []
 for i in range (7):
-    img = pygame.image.load(f"assets//images//characters//player//Player_{i}.png").convert_alpha()
+    img = pygame.image.load(f"assets//images//characters//player//Player_{i}.png")
     img = escalar_img(img, Constantes.SCALA_PERSONAJE)
     animaciones.append(img)
 
 #ARMA
-imagen_pistola = pygame.image.load(f"assets//images//characters//weapons//gun.png").convert_alpha()
-
+imagen_pistola = pygame.image.load(f"assets//images//weapons//gun.png")
+imagen_pistola = escalar_img(imagen_pistola, Constantes.SCALA_ARMA)
 
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE

@@ -10,8 +10,7 @@ class Personaje():
         #AQUI SE ALMACENA LA HORA ACTUAL EN MILISEGUNDOS DESDE QUE SE INICIO PYGAME
         self.update_time = pygame.time.get_ticks()
         self.image = animaciones[self.frame_index]
-        self.forma = pygame.Rect(0, 0, Constantes.ANCHO_PERSONAJE,
-                                        Constantes.ALTO_PERSONAJE)
+        self.forma = self.image.get_rect()
         self.forma.center = (x,y)
 
 
