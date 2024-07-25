@@ -26,12 +26,16 @@ for i in range (7):
 imagen_pistola = pygame.image.load(f"assets//images//weapons//gun.png")
 imagen_pistola = escalar_img(imagen_pistola, Constantes.SCALA_ARMA)
 
+#BALAS
+imagen_balas = pygame.image.load(f"assets//images//weapons//bullet.png")
+imagen_balas = escalar_img(imagen_balas, Constantes.SCALA_ARMA)
+
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE
 Jugador = Personaje(50, 50, animaciones)
 
 #CREAR UN ARMA DE LA CLASE WEAPON
-pistola = Weapon(imagen_pistola)
+pistola = Weapon(imagen_pistola, imagen_balas)
 
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
