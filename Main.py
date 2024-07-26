@@ -37,6 +37,9 @@ Jugador = Personaje(50, 50, animaciones)
 #CREAR UN ARMA DE LA CLASE WEAPON
 pistola = Weapon(imagen_pistola, imagen_balas)
 
+#CREAR UN GRUPO DE SPRITES
+grupo_balas = pygame.sprite.Group()
+
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
 mover_arriba = False
@@ -73,7 +76,13 @@ while run == True:
     Jugador.update()
 
     #ACTUALIZA EL ESTADO DEL ARMA
-    pistola.update(Jugador)
+    bala = pistola.update(Jugador)
+    if bala:
+        grupo_balas.add(bala)
+    for bala in grupo_balas:
+        bala.update()
+
+    print(grupo_balas)
 
     #DIBUJAR AL JUGADOR
     Jugador.dibujar(ventana)
@@ -81,7 +90,14 @@ while run == True:
     #DIBUJAR EL ARMA
     pistola.dibujar(ventana)
 
+
+    #DIBUJAR BALAS
+    for bala in grupo_balas:
+        bala.dibujar(ventana)
+
+
     for event in pygame.event.get():
+        #PARA CERRAR EL JUEGO
         if event.type == pygame.QUIT:
             run = False
 
