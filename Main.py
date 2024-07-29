@@ -2,6 +2,7 @@ import pygame
 import Constantes
 from Personaje import Personaje
 from Weapon import Weapon
+from Textos import DamageText
 import os
 
 #FUNCIONES:
@@ -20,11 +21,14 @@ def contar_elementos(directorio):
 def nombres_carpetas(directorio):
     return os.listdir(directorio)
 
-
 pygame.init()
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
 pygame.display.set_caption("Mi Primer Juego")
+
+
+#FUENTES
+font= pygame.font.Font("assets//fonts//mago3.ttf", 25)
 
 
 #IMPORTAR IMAGENES
@@ -80,6 +84,7 @@ lista_enemigos.append(honguito_2)
 pistola = Weapon(imagen_pistola, imagen_balas)
 
 #CREAR UN GRUPO DE SPRITES
+grupo_damage_text = pygame.sprite.Group()
 grupo_balas = pygame.sprite.Group()
 
 
@@ -126,7 +131,13 @@ while run == True:
     if bala:
         grupo_balas.add(bala)
     for bala in grupo_balas:
-        bala.update(lista_enemigos)
+        damage, pos_damage = bala.update(lista_enemigos)
+        if damage:
+            damage_text = DamageText(pos_damage.centerx, pos_damage.centery, str(damage), font, Constantes.ROJO)
+            grupo_damage_text.add(damage_text)
+
+    #ACTUALIZAR DAÑO
+    grupo_damage_text.update()
 
 
 
@@ -144,6 +155,9 @@ while run == True:
     #DIBUJAR BALAS
     for bala in grupo_balas:
         bala.dibujar(ventana)
+
+    #DIBUJAR TEXTOS
+    grupo_damage_text.draw(ventana)
 
 
     for event in pygame.event.get():
