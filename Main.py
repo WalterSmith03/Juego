@@ -1,8 +1,10 @@
 import pygame
 import Constantes
+import pygame.sprite
 from Personaje import Personaje
 from Weapon import Weapon
 from Textos import DamageText
+from Items import Item
 import os
 
 #FUNCIONES:
@@ -25,7 +27,6 @@ pygame.init()
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
 pygame.display.set_caption("Mi Primer Juego")
-
 
 #FUENTES
 font= pygame.font.Font("assets//fonts//mago3.ttf", 25)
@@ -63,7 +64,6 @@ for eni in tipo_enemigos:
         lista_temp.append(img_enemigo)
     animaciones_enemigos.append(lista_temp)
 
-
 #ARMA
 imagen_pistola = pygame.image.load(f"assets//images//weapons//gun.png")
 imagen_pistola = escalar_img(imagen_pistola, Constantes.SCALA_ARMA)
@@ -71,6 +71,24 @@ imagen_pistola = escalar_img(imagen_pistola, Constantes.SCALA_ARMA)
 #BALAS
 imagen_balas = pygame.image.load(f"assets//images//weapons//bullet.png")
 imagen_balas = escalar_img(imagen_balas, Constantes.SCALA_ARMA)
+
+#ACRGAR IMAGENES DE LOS ITEMS
+posion_roja = pygame.image.load("assets//images//items//potion.png")
+posion_roja = escalar_img(posion_roja, 0.02)
+
+coin_images = []
+ruta_img = "assets//images//items//coin"
+num_coin_images = contar_elementos(ruta_img)
+print(f"Numero de imagenes de monedas: {num_coin_images}")
+for i in range(num_coin_images):
+    img = pygame.image.load(f"assets//images//items//coin//coin_{i+1}.png")
+    img = escalar_img(img, 1)
+    coin_images.append(img)
+
+def dibujar_texto(texto, fuente, color, x, y):
+    img = fuente.render(texto, True, color)
+    ventana.blit(img, (x,y))
+
 
 def vida_jugador():
     c_mitad_dibujado = False
@@ -84,7 +102,7 @@ def vida_jugador():
             ventana.blit(corazon_vacio, (5+i*50, 5))
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE
-Jugador = Personaje(50, 50, animaciones, 100)
+Jugador = Personaje(50, 50, animaciones, 20)
 
 #CREAR UN ENEMIGO DE LA CLASE PERSONAJE
 goblin = Personaje(400, 300, animaciones_enemigos[0], 100)
@@ -99,14 +117,19 @@ lista_enemigos.append(goblin_2)
 lista_enemigos.append(honguito)
 lista_enemigos.append(honguito_2)
 
-
 #CREAR UN ARMA DE LA CLASE WEAPON
 pistola = Weapon(imagen_pistola, imagen_balas)
 
 #CREAR UN GRUPO DE SPRITES
 grupo_damage_text = pygame.sprite.Group()
 grupo_balas = pygame.sprite.Group()
+grupo_items = pygame.sprite.Group()
 
+coin = Item(350, 25, 0, coin_images)
+potion = Item(380, 55, 1, [posion_roja])
+
+grupo_items.add(coin)
+grupo_items.add(potion)
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
 mover_arriba = False
@@ -159,7 +182,8 @@ while run == True:
     #ACTUALIZAR DAÑO
     grupo_damage_text.update()
 
-
+    #ACTUALIZAR ITEMS
+    grupo_items.update(Jugador)
 
     #DIBUJAR AL JUGADOR
     Jugador.dibujar(ventana)
@@ -182,6 +206,10 @@ while run == True:
 
     #DIBUJAR TEXTOS
     grupo_damage_text.draw(ventana)
+    dibujar_texto(f"Score: {Jugador.score}", font,(255,255,0), 700, 5)
+
+    #DIBUJAR ITEMS
+    grupo_items.draw(ventana)
 
 
     for event in pygame.event.get():
