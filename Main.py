@@ -5,6 +5,7 @@ from Personaje import Personaje
 from Weapon import Weapon
 from Textos import DamageText
 from Items import Item
+from Mundo import Mundo
 import os
 
 #FUNCIONES:
@@ -72,6 +73,13 @@ imagen_pistola = escalar_img(imagen_pistola, Constantes.SCALA_ARMA)
 imagen_balas = pygame.image.load(f"assets//images//weapons//bullet.png")
 imagen_balas = escalar_img(imagen_balas, Constantes.SCALA_ARMA)
 
+#CARGAR IMAGENES EDL MUNDO
+tile_list = []
+for x in range(Constantes.TILE_TYPES):
+    tile_image = pygame.image.load(f"assets//images//tiles//tile ({x+1}).png")
+    tile_image = pygame.transform.scale(tile_image, (Constantes.TILE_SIZE, Constantes.TILE_SIZE))
+    tile_list.append(tile_image)
+
 #ACRGAR IMAGENES DE LOS ITEMS
 posion_roja = pygame.image.load("assets//images//items//potion.png")
 posion_roja = escalar_img(posion_roja, 0.02)
@@ -100,6 +108,24 @@ def vida_jugador():
             c_mitad_dibujado = True
         else:
             ventana.blit(corazon_vacio, (5+i*50, 5))
+
+world_data = [
+    [1,1,1,1,1,15],
+    [0,19,19,19,19,15],
+    [0,19,19,19,19,15],
+    [0,19,19,19,19,15],
+    [0,19,19,19,19,15],
+    [0,19,19,19,19,15],
+    [0,1,1,1,1,15]
+]
+
+world = Mundo()
+world.process_data(world_data, tile_list)
+
+def dibujar_grid():
+    for x in range(30):
+        pygame.draw.line(ventana, Constantes.BLANCO, (x*Constantes.TILE_SIZE, 0), (x*Constantes.TILE_SIZE, Constantes.ALTO_VENTANA))
+        pygame.draw.line(ventana, Constantes.BLANCO, (0, x * Constantes.TILE_SIZE), (Constantes.ANCHO_VENTANA, x* Constantes.TILE_SIZE))
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE
 Jugador = Personaje(50, 50, animaciones, 20)
@@ -146,6 +172,8 @@ while run == True:
     reloj.tick(Constantes.FPS)
     ventana.fill(Constantes.COLOR_BG)
 
+    dibujar_grid()
+
     #CALCULAR EL MOVIMIENTO DEL JUGADOR
     delta_x = 0
     delta_y = 0
@@ -185,10 +213,13 @@ while run == True:
     #ACTUALIZAR ITEMS
     grupo_items.update(Jugador)
 
+    #DIBUJAR MUNDO
+    world.draw(ventana)
+
     #DIBUJAR AL JUGADOR
     Jugador.dibujar(ventana)
 
-    # DIBUJAR AL JUGADOR
+    # DIBUJAR A LOS ENEMIGOS
     for ene in lista_enemigos:
         ene.dibujar(ventana)
 
