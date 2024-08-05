@@ -7,6 +7,7 @@ from Textos import DamageText
 from Items import Item
 from Mundo import Mundo
 import os
+import csv
 
 #FUNCIONES:
 #ESCALAR IMAGENES
@@ -28,6 +29,10 @@ pygame.init()
 ventana = pygame.display.set_mode((Constantes.ANCHO_VENTANA,
                                    Constantes.ALTO_VENTANA))
 pygame.display.set_caption("Mi Primer Juego")
+
+#VARIABLES
+posicion_pantalla = [0, 0]
+
 
 #FUENTES
 font= pygame.font.Font("assets//fonts//mago3.ttf", 25)
@@ -109,15 +114,20 @@ def vida_jugador():
         else:
             ventana.blit(corazon_vacio, (5+i*50, 5))
 
-world_data = [
-    [1,1,1,1,1,15],
-    [0,19,19,19,19,15],
-    [0,19,19,19,19,15],
-    [0,19,19,19,19,15],
-    [0,19,19,19,19,15],
-    [0,19,19,19,19,15],
-    [0,1,1,1,1,15]
-]
+world_data = []
+
+for fila in range(Constantes.FILAS):
+    filas = [6] * Constantes.COLUMNAS
+    world_data.append(filas)
+
+#CARGAR EL ARCHIVO CON EL NIVEL
+with open("niveles//nivel_test.csv", newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, fila in enumerate(reader):
+        for y, columna in enumerate(fila):
+            world_data[x][y] = int(columna)
+
+print(filas)
 
 world = Mundo()
 world.process_data(world_data, tile_list)
@@ -195,7 +205,7 @@ while run == True:
     #ACTUALIZA EL ESTADO DEL ENEMIGO
     for ene in lista_enemigos:
         ene.update()
-        print(ene.energia)
+
 
     #ACTUALIZA EL ESTADO DEL ARMA
     bala = pistola.update(Jugador)
