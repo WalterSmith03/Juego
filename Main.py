@@ -32,6 +32,7 @@ pygame.display.set_caption("Mi Primer Juego")
 
 #VARIABLES
 posicion_pantalla = [0, 0]
+nivel = 1
 
 
 #FUENTES
@@ -98,6 +99,8 @@ for i in range(num_coin_images):
     img = escalar_img(img, 1)
     coin_images.append(img)
 
+item_imagenes = [coin_images, [posion_roja]]
+
 def dibujar_texto(texto, fuente, color, x, y):
     img = fuente.render(texto, True, color)
     ventana.blit(img, (x,y))
@@ -130,7 +133,7 @@ with open("niveles//nivel_test.csv", newline='') as csvfile:
 print(filas)
 
 world = Mundo()
-world.process_data(world_data, tile_list)
+world.process_data(world_data, tile_list, item_imagenes)
 
 def dibujar_grid():
     for x in range(30):
@@ -138,13 +141,13 @@ def dibujar_grid():
         pygame.draw.line(ventana, Constantes.BLANCO, (0, x * Constantes.TILE_SIZE), (Constantes.ANCHO_VENTANA, x* Constantes.TILE_SIZE))
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE
-Jugador = Personaje(50, 50, animaciones, 20)
+Jugador = Personaje(50, 50, animaciones, 20, 1)
 
 #CREAR UN ENEMIGO DE LA CLASE PERSONAJE
-goblin = Personaje(400, 300, animaciones_enemigos[0], 100)
-honguito = Personaje(200, 200, animaciones_enemigos[1], 100)
-goblin_2 = Personaje(100, 250, animaciones_enemigos[0], 100)
-honguito_2 = Personaje(100, 150, animaciones_enemigos[1], 100)
+goblin = Personaje(400, 300, animaciones_enemigos[0], 100, 2)
+honguito = Personaje(200, 200, animaciones_enemigos[1], 100, 2)
+goblin_2 = Personaje(100, 250, animaciones_enemigos[0], 100, 2)
+honguito_2 = Personaje(100, 150, animaciones_enemigos[1], 100, 2)
 
 #CREAR UNA LISTA DE ENEMIGOS
 lista_enemigos = []
@@ -160,12 +163,11 @@ pistola = Weapon(imagen_pistola, imagen_balas)
 grupo_damage_text = pygame.sprite.Group()
 grupo_balas = pygame.sprite.Group()
 grupo_items = pygame.sprite.Group()
+#AÑADIR ITEMS DESDE AL DATA DEL NIVEL
+for item in world.lista_item:
+    grupo_items.add(item)
 
-coin = Item(350, 25, 0, coin_images)
-potion = Item(380, 55, 1, [posion_roja])
 
-grupo_items.add(coin)
-grupo_items.add(potion)
 
 #DEFINIR LAS VARIABLES DE MOVIMIENTO DEL JUGADOR
 mover_arriba = False
@@ -198,7 +200,11 @@ while run == True:
         delta_y = Constantes.VELOCIDAD
 
     #MVOVER ALL JUGADOR
-    Jugador.movimeinto(delta_x, delta_y)
+    posicion_pantalla = Jugador.movimeinto(delta_x, delta_y)
+    print(posicion_pantalla)
+
+    #ACTUALIZAR EL MAPA
+    world.update(posicion_pantalla)
 
     #ACTUALIZA EL ESTADO DEL JUGADOR
     Jugador.update()
@@ -218,10 +224,10 @@ while run == True:
             grupo_damage_text.add(damage_text)
 
     #ACTUALIZAR DAÑO
-    grupo_damage_text.update()
+    grupo_damage_text.update(posicion_pantalla)
 
     #ACTUALIZAR ITEMS
-    grupo_items.update(Jugador)
+    grupo_items.update(posicion_pantalla, Jugador)
 
     #DIBUJAR MUNDO
     world.draw(ventana)
@@ -231,6 +237,7 @@ while run == True:
 
     # DIBUJAR A LOS ENEMIGOS
     for ene in lista_enemigos:
+        ene.enemigos(posicion_pantalla)
         ene.dibujar(ventana)
 
     #DIBUJAR EL ARMA
@@ -248,6 +255,9 @@ while run == True:
     #DIBUJAR TEXTOS
     grupo_damage_text.draw(ventana)
     dibujar_texto(f"Score: {Jugador.score}", font,(255,255,0), 700, 5)
+    #NIVEL
+    dibujar_texto(f"Nivel: " + str(nivel), font, Constantes.BLANCO, Constantes.ANCHO_VENTANA / 2, 5)
+
 
     #DIBUJAR ITEMS
     grupo_items.draw(ventana)
