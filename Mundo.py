@@ -3,7 +3,7 @@ import Constantes
 from Items import Item
 from Personaje import Personaje
 
-obstaculos = [2, 66, 67]
+obstaculos = [2, 10, 15, 40, 41, 45, 51, 66, 67]
 
 puerta_cerrada = [36, 37, 66, 67]
 

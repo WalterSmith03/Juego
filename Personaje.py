@@ -21,8 +21,12 @@ class Personaje():
         self.golpe = False
         self.ultimo_golpe = pygame.time.get_ticks()
 
-    def movimeinto(self, delta_x, delta_y, obstaculos_tiles):
+    def actualizar_coordenadas(self, tupla):
+        self.forma.center = (tupla[0], tupla[1])
+
+    def movimeinto(self, delta_x, delta_y, obstaculos_tiles, exit_tile):
         posicion_pantalla = [0, 0]
+        nivel_completado = False
         if delta_x < 0:
             self.flip = True
         if delta_x > 0:
@@ -48,6 +52,10 @@ class Personaje():
 
         # LOGICA SOO APLICA AL JUGADOR Y NO ENEMIGOS
         if self.tipo == 1:
+            #CHEQUEAR COLISION CON LA SALIDA
+            if exit_tile[1].colliderect(self.forma):
+                nivel_completado = True
+                print("nivel completado")
             #ACTUALIZAR LA PANTALLA BASADO LA POSICION DEL JUGADOR
             # MOVER LA CAMARA DE IZQUIERDA A DERECHA
             if self.forma.right > (Constantes.ANCHO_VENTANA - Constantes.LIMITE_PANTALLA):
@@ -66,9 +74,9 @@ class Personaje():
                 self.forma.top = Constantes.LIMITE_PANTALLA
 
 
-            return posicion_pantalla
+            return posicion_pantalla, nivel_completado
 
-    def enemigos(self, Jugador, obstaculos_tiles, posicion_pantalla):
+    def enemigos(self, Jugador, obstaculos_tiles, posicion_pantalla, exit_tile):
         clipped_line = ()
         ene_dx = 0
         ene_dy = 0
@@ -101,7 +109,7 @@ class Personaje():
             if self.forma.centery < Jugador.forma.centery:
                 ene_dy = Constantes.VELOCIDAD_ENEMIGO
 
-        self.movimeinto(ene_dx, ene_dy,obstaculos_tiles)
+        self.movimeinto(ene_dx, ene_dy,obstaculos_tiles, exit_tile)
 
         #ATACAR AL JUGADOR
         if distancia < Constantes.RANGO_ATAQUE and Jugador.golpe == False:
