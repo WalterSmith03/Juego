@@ -1,5 +1,6 @@
 import pygame
 import Constantes
+import math
 
 class Personaje():
     def __init__(self, x, y, animaciones, energia, tipo):
@@ -16,16 +17,34 @@ class Personaje():
         self.forma = self.image.get_rect()
         self.forma.center = (x,y)
         self.tipo = tipo
+        self.ultimo_golpe = pygame.time.get_ticks()
+        self.golpe = False
+        self.ultimo_golpe = pygame.time.get_ticks()
 
-
-    def movimeinto(self, delta_x, delta_y):
+    def movimeinto(self, delta_x, delta_y, obstaculos_tiles):
         posicion_pantalla = [0, 0]
         if delta_x < 0:
             self.flip = True
         if delta_x > 0:
             self.flip = False
         self.forma.x = self.forma.x + delta_x
+        for obstacle in obstaculos_tiles:
+            if obstacle[1].colliderect(self.forma):
+                if delta_x > 0:
+                    self.forma.right = obstacle[1].left
+                if delta_x < 0:
+                    self.forma.left = obstacle[1].right
+
+
+
         self.forma.y = self.forma.y + delta_y
+        for obstaculo in obstaculos_tiles:
+            #CHEQUEO DE COLISION
+            if obstaculo[1].colliderect(self.forma):
+                if delta_y > 0:
+                    self.forma.bottom = obstaculo[1].top
+                if delta_y < 0:
+                    self.forma.top = obstaculo[1].bottom
 
         # LOGICA SOO APLICA AL JUGADOR Y NO ENEMIGOS
         if self.tipo == 1:
@@ -49,17 +68,62 @@ class Personaje():
 
             return posicion_pantalla
 
-    def enemigos(self, posicion_pantalla):
-        #REPOSICIONAR ENEMIGOS
+    def enemigos(self, Jugador, obstaculos_tiles, posicion_pantalla):
+        clipped_line = ()
+        ene_dx = 0
+        ene_dy = 0
+
+        #REPOSICIONAR ENEMIGOS BASADO EN LA POSICION DE LA PANTALLA
         self.forma.x += posicion_pantalla[0]
         self.forma.y += posicion_pantalla[1]
+
+        #CREAR UNA LINEA DE VISION
+        linea_de_vision = ((self.forma.centerx, self.forma.centery),
+                           (Jugador.forma.centerx, Jugador.forma.centery))
+
+        #CHEQUEO SI HAY OBSTACULOS EN LA LINEA DE VISION DEL ENEMIGO
+        for obs in obstaculos_tiles:
+            if obs[1].clipline(linea_de_vision):
+                clipped_line = obs[1].clipline(linea_de_vision)
+
+
+        #DISTANCIA CON EL JUGADOR
+        distancia = math.sqrt(((self.forma.centerx - Jugador.forma.centerx)**2) +
+                     ((self.forma.centery - Jugador.forma.centery)**2))
+
+        if not clipped_line and distancia < Constantes.RANGO:
+            if self.forma.centerx > Jugador.forma.centerx:
+                ene_dx = -Constantes.VELOCIDAD_ENEMIGO
+            if self.forma.centerx < Jugador.forma.centerx:
+                ene_dx = Constantes.VELOCIDAD_ENEMIGO
+            if self.forma.centery > Jugador.forma.centery:
+                ene_dy = -Constantes.VELOCIDAD_ENEMIGO
+            if self.forma.centery < Jugador.forma.centery:
+                ene_dy = Constantes.VELOCIDAD_ENEMIGO
+
+        self.movimeinto(ene_dx, ene_dy,obstaculos_tiles)
+
+        #ATACAR AL JUGADOR
+        if distancia < Constantes.RANGO_ATAQUE and Jugador.golpe == False:
+            Jugador.energia -= 10
+            Jugador.golpe = True
+            Jugador.ultimo_golpe = pygame.time.get_ticks()
 
     def update(self):
         #COMPROBAR SI EL PERSONAJE HA MUERTO
         if self. energia <= 0:
             self.energia = 0
             self.vivo = False
-        
+
+        #TIMER PARA PODER VOLVER A RECIBIR DAÑO
+        golpe_cooldown = 1000
+        if self.tipo == 1:
+            if self.golpe == True:
+                if pygame.time.get_ticks() - self.ultimo_golpe > golpe_cooldown:
+                    self.golpe = False
+
+
+
         cooldown_animacion = 100
         self.image = self.animaciones[self.frame_index]
         if pygame.time.get_ticks() - self.update_time >= cooldown_animacion:

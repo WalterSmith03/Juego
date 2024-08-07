@@ -133,7 +133,7 @@ with open("niveles//nivel_test.csv", newline='') as csvfile:
 print(filas)
 
 world = Mundo()
-world.process_data(world_data, tile_list, item_imagenes)
+world.process_data(world_data, tile_list, item_imagenes, animaciones_enemigos)
 
 def dibujar_grid():
     for x in range(30):
@@ -141,20 +141,13 @@ def dibujar_grid():
         pygame.draw.line(ventana, Constantes.BLANCO, (0, x * Constantes.TILE_SIZE), (Constantes.ANCHO_VENTANA, x* Constantes.TILE_SIZE))
 
 #CREAR UN JUGADOR DE LA CLASE PERSONAJE
-Jugador = Personaje(50, 50, animaciones, 20, 1)
-
-#CREAR UN ENEMIGO DE LA CLASE PERSONAJE
-goblin = Personaje(400, 300, animaciones_enemigos[0], 100, 2)
-honguito = Personaje(200, 200, animaciones_enemigos[1], 100, 2)
-goblin_2 = Personaje(100, 250, animaciones_enemigos[0], 100, 2)
-honguito_2 = Personaje(100, 150, animaciones_enemigos[1], 100, 2)
+Jugador = Personaje(50, 50, animaciones, 100, 1)
 
 #CREAR UNA LISTA DE ENEMIGOS
 lista_enemigos = []
-lista_enemigos.append(goblin)
-lista_enemigos.append(goblin_2)
-lista_enemigos.append(honguito)
-lista_enemigos.append(honguito_2)
+for ene in world.lista_enemigo:
+    lista_enemigos.append(ene)
+
 
 #CREAR UN ARMA DE LA CLASE WEAPON
 pistola = Weapon(imagen_pistola, imagen_balas)
@@ -182,9 +175,8 @@ run = True
 while run == True:
     #QUE VAYA A 60 FPS
     reloj.tick(Constantes.FPS)
-    ventana.fill(Constantes.COLOR_BG)
+    ventana.fill(Constantes.MORADO)
 
-    dibujar_grid()
 
     #CALCULAR EL MOVIMIENTO DEL JUGADOR
     delta_x = 0
@@ -200,8 +192,8 @@ while run == True:
         delta_y = Constantes.VELOCIDAD
 
     #MVOVER ALL JUGADOR
-    posicion_pantalla = Jugador.movimeinto(delta_x, delta_y)
-    print(posicion_pantalla)
+    posicion_pantalla = Jugador.movimeinto(delta_x, delta_y, world.obstaculos_tiles)
+
 
     #ACTUALIZAR EL MAPA
     world.update(posicion_pantalla)
@@ -218,7 +210,7 @@ while run == True:
     if bala:
         grupo_balas.add(bala)
     for bala in grupo_balas:
-        damage, pos_damage = bala.update(lista_enemigos)
+        damage, pos_damage = bala.update(lista_enemigos, world.obstaculos_tiles)
         if damage:
             damage_text = DamageText(pos_damage.centerx, pos_damage.centery, str(damage), font, Constantes.ROJO)
             grupo_damage_text.add(damage_text)
@@ -237,8 +229,11 @@ while run == True:
 
     # DIBUJAR A LOS ENEMIGOS
     for ene in lista_enemigos:
-        ene.enemigos(posicion_pantalla)
-        ene.dibujar(ventana)
+        if ene.energia == 0:
+            lista_enemigos.remove(ene)
+        if ene.energia > 0:
+            ene.enemigos(Jugador, world.obstaculos_tiles, posicion_pantalla)
+            ene.dibujar(ventana)
 
     #DIBUJAR EL ARMA
     pistola.dibujar(ventana)
@@ -277,6 +272,9 @@ while run == True:
                 mover_arriba = True
             if event.key == pygame.K_s:
                 mover_abajo = True
+            if event.key == pygame.K_e:
+                if world.abrir_puerta(Jugador, tile_list):
+                    print("puerta cambiada")
 
 
         #PARA CUANDO SE SUELTA LA TECLA
